@@ -1,0 +1,31 @@
+// {
+//     "compilerOptions": {
+//         "outDir": "dist",
+//         "rootDirs": ["src"],
+//         "incremental": true,
+//         "target": "es2016",
+//         "experimentalDecorators": true,
+//         "emitDecoratorMetadata": true,
+//         "module": "CommonJS",
+//         "strict": true,
+//         "esModuleInterop": true,
+//         "skipLibCheck": true,
+//         "forceConsistentCasingInFileNames": true,
+//         "strictPropertyInitialization": false,
+//         "allowJs": true
+//     }
+// }
+
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "incremental": true,
+        "target": "ES2016",
+        "module": "CommonJS",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "allowJs": true
+    }
+}
