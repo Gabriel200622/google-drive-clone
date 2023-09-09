@@ -14,4 +14,38 @@ model User {
   email        String  @unique
   userImageId  String?
   userImageUrl String? @default("https://res.cloudinary.com/duwhxat61/image/upload/v1685988311/user_lg0arj.png")
+
+  folders Folder[]
+  files   File[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Folder {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  user   User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+  userId String @db.ObjectId
+
+  folderId String? @db.ObjectId
+  folder   Folder? @relation("FolderInFolder", references: [id], fields: [folderId], onDelete: NoAction, onUpdate: NoAction)
+
+  folders Folder[] @relation("FolderInFolder")
+  files   File[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model File {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  user     User?   @relation(references: [id], fields: [userId], onDelete: Cascade)
+  userId   String? @db.ObjectId
+  folder   Folder? @relation(references: [id], fields: [folderId], onDelete: Cascade)
+  folderId String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

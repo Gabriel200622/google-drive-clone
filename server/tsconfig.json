@@ -20,11 +20,12 @@
     "compilerOptions": {
         "outDir": "dist",
         "incremental": true,
-        "target": "ES2016",
-        "module": "CommonJS",
+        "target": "es2016",
+        "module": "commonjs",
         "strict": true,
         "esModuleInterop": true,
-        "skipLibCheck": true,
+        /* "skipLibCheck": true,*/
+        "typeRoots": ["src/@types", "./node_modules/@types"],
         "forceConsistentCasingInFileNames": true,
         "allowJs": true
     }

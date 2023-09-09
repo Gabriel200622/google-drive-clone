@@ -21,7 +21,7 @@ export const responseHandler = (props: IResponse) => {
         message = props.msg ? props.msg : "success";
     }
 
-    props.res.status(props.status).json({
+    return props.res.status(props.status).json({
         msg: message,
         data: props.data,
     });

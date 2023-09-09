@@ -1,6 +1,6 @@
 import { Server } from "./presentation/server";
 import { AppRoutes } from "./presentation/routes";
-import { envs } from "./config/envs";
+import { envs } from "./config";
 
 const main = async () => {
     const server = new Server();
