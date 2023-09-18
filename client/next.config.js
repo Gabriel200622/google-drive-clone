@@ -5,6 +5,7 @@ const nextConfig = {
             "lh3.googleusercontent.com",
             "res.cloudinary.com",
             "images.unsplash.com",
+            "bigdrive-bucket.s3.sa-east-1.amazonaws.com",
         ],
     },
     env: {

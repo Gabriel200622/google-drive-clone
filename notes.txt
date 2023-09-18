@@ -1,8 +1,5 @@
-- Upload files to the folders
-- 
-- 
-- 
-- 
+- Handle undefined data in controllers
+- File size
 - 
 - 
 - 

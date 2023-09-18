@@ -39,8 +39,16 @@ model Folder {
 }
 
 model File {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   name     String
+  url      String
+  key      String
+  type     String
+  fileSize String
+
+  thumbnail    String?
+  thumbnailKey String?
+
   user     User?   @relation(references: [id], fields: [userId], onDelete: Cascade)
   userId   String? @db.ObjectId
   folder   Folder? @relation(references: [id], fields: [folderId], onDelete: Cascade)

@@ -14,11 +14,14 @@ import {
     DialogTitle,
     DialogTrigger,
     Input,
+    Portal,
+    ScrollArea,
 } from "@bigcomponents/core";
-import { FolderPlus, Loader2 } from "@bigcomponents/core/lucide";
+import { FileUpIcon, FolderPlus, Loader2 } from "@bigcomponents/core/lucide";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useDisclosure } from "@bigcomponents/hooks";
+import SelectElements from "./select-elements";
 
 interface Props {
     children: React.ReactNode;
@@ -28,10 +31,13 @@ interface Props {
 const DriveProvider = ({ children, folderId }: Props) => {
     const router = useRouter();
 
-    const [opened, handlers] = useDisclosure();
-    const [folderName, setFolderName] = useState<string>("");
+    const inputRef = useRef<HTMLInputElement>(null);
 
+    const [openedFolderDialog, handlersFolderDialog] = useDisclosure();
+
+    const [folderName, setFolderName] = useState<string>("Untitled folder");
     const [loading, setLoading] = useState<boolean>(false);
+    const [loadingNewFile, setLoadingNewFile] = useState<boolean>(false);
 
     const createFolder = async (name: string) => {
         try {
@@ -42,7 +48,8 @@ const DriveProvider = ({ children, folderId }: Props) => {
                 folderId: folderId ? folderId : undefined,
             });
 
-            handlers.close();
+            setFolderName("Untitled folder");
+            handlersFolderDialog.close();
             router.refresh();
         } catch (error) {
             console.log(error);
@@ -51,52 +58,126 @@ const DriveProvider = ({ children, folderId }: Props) => {
         }
     };
 
+    const handleUploadFile = async (e: any) => {
+        const imagesArray: any = Object.values(e.target.files);
+
+        if (!imagesArray.length) return;
+
+        try {
+            setLoadingNewFile(true);
+
+            await Promise.all(
+                imagesArray.map(async (img: any) => {
+                    const file = img;
+
+                    const form = new FormData();
+
+                    form.append("file", file);
+                    form.append("folderId", folderId ? folderId : "");
+
+                    await axiosClient.post(
+                        `/file/upload`,
+                        {
+                            file: file,
+                            folderId: folderId ? folderId : undefined,
+                        },
+                        {
+                            headers: {
+                                "Content-Type": "multipart/form-data",
+                            },
+                        }
+                    );
+                })
+            );
+
+            router.refresh();
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoadingNewFile(false);
+        }
+    };
+
     return (
-        <Dialog onOpenChange={handlers.toggle} open={opened}>
-            <ContextMenu modal={false}>
-                <ContextMenuTrigger>{children}</ContextMenuTrigger>
+        <>
+            <Dialog
+                onOpenChange={handlersFolderDialog.toggle}
+                open={openedFolderDialog}
+            >
+                <ContextMenu modal={false}>
+                    <ContextMenuTrigger className="h-[calc(95vh-5.7rem)]">
+                        <ScrollArea className="h-full px-5">
+                            <SelectElements>{children}</SelectElements>
+                        </ScrollArea>
+                        SelectElements
+                    </ContextMenuTrigger>
 
-                <ContextMenuContent>
-                    <DialogTrigger>
-                        <ContextMenuItem>
-                            <FolderPlus className="h-5 w-5 mr-3" />
+                    <ContextMenuContent className="flex-col flex">
+                        <DialogTrigger>
+                            <ContextMenuItem>
+                                <FolderPlus className="h-5 w-5 mr-3" />
 
-                            <span>New folder</span>
+                                <span>New folder</span>
+                            </ContextMenuItem>
+                        </DialogTrigger>
+
+                        <ContextMenuItem
+                            onClick={() => inputRef.current?.click()}
+                        >
+                            <FileUpIcon className="h-5 w-5 mr-3" />
+
+                            <span>File upload</span>
                         </ContextMenuItem>
-                    </DialogTrigger>
-                </ContextMenuContent>
-            </ContextMenu>
+                    </ContextMenuContent>
+                </ContextMenu>
 
-            <DialogContent className="md:w-[330px]">
-                <DialogHeader>
-                    <DialogTitle>New folder</DialogTitle>
-                </DialogHeader>
+                <DialogContent className="md:w-[330px]">
+                    <DialogHeader>
+                        <DialogTitle>New folder</DialogTitle>
+                    </DialogHeader>
 
-                <div>
-                    <Input
-                        onChange={(e) => setFolderName(e.currentTarget.value)}
-                        value={folderName}
-                    />
-                </div>
+                    <div>
+                        <Input
+                            onChange={(e) =>
+                                setFolderName(e.currentTarget.value)
+                            }
+                            value={folderName}
+                        />
+                    </div>
 
-                <DialogFooter>
-                    <Button
-                        type="button"
-                        onClick={() => createFolder(folderName)}
-                        className="rounded-full"
-                        variant="ghost"
-                        size={loading ? "icon" : "default"}
-                        disabled={loading || !folderName}
-                    >
-                        {loading ? (
-                            <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                            "Create"
-                        )}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            onClick={() => createFolder(folderName)}
+                            className="rounded-full"
+                            variant="ghost"
+                            size={loading ? "icon" : "default"}
+                            disabled={loading || !folderName}
+                        >
+                            {loading ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                                "Create"
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <input
+                ref={inputRef}
+                type="file"
+                onChange={handleUploadFile}
+                hidden
+                multiple
+            />
+
+            {loadingNewFile && (
+                <Portal className="fixed bottom-0 right-10 bg-background p-3 rounded-tr-md rounded-tl-md w-[360px] shadow-md border">
+                    Loading...
+                </Portal>
+            )}
+        </>
     );
 };
 

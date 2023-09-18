@@ -1,5 +1,5 @@
 import { FolderDto, FolderEntity } from "../../../domain";
-import { db } from "../../../lib";
+import { db, deleteFile } from "../../../lib";
 import { FolderDataSource, TreeItem } from "../../interfaces";
 
 export class MongoFolderDataSource implements FolderDataSource {
@@ -33,7 +33,9 @@ export class MongoFolderDataSource implements FolderDataSource {
                 userId: userId,
             },
             include: {
-                folders: true,
+                folders: {
+                    orderBy: { createdAt: "desc" },
+                },
             },
         });
 
@@ -97,6 +99,7 @@ export class MongoFolderDataSource implements FolderDataSource {
             },
             include: {
                 folders: true,
+                files: true,
             },
         });
 
@@ -104,6 +107,9 @@ export class MongoFolderDataSource implements FolderDataSource {
 
         for (const subFolder of folder.folders) {
             await this.deleteFolder(userId, subFolder.id);
+        }
+        for (const subFile of folder.files) {
+            await this.deleteFile(userId, subFile.id);
         }
 
         await db.folder.delete({
@@ -114,6 +120,29 @@ export class MongoFolderDataSource implements FolderDataSource {
         });
 
         return "Folder deleted successfully";
+    }
+
+    async deleteFile(
+        userId: string,
+        fileId: string
+    ): Promise<string | undefined> {
+        const file = await db.file.findUnique({
+            where: {
+                id: fileId,
+                userId: userId,
+            },
+        });
+
+        if (!file) return "File not found";
+
+        // Delete file from AWS S3
+        await deleteFile(file.key);
+        // Delete thumbnail from AWS S3
+        if (file.thumbnailKey) await deleteFile(file.thumbnailKey);
+
+        await db.file.delete({ where: { id: file.id } });
+
+        return "File deleted successfully";
     }
 
     async getFolders(userId: string): Promise<FolderEntity[] | undefined> {

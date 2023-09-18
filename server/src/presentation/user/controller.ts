@@ -127,4 +127,35 @@ export class UserController {
             });
         }
     };
+
+    public logOut = async (req: Request, res: Response) => {
+        try {
+            const serialized = serialize("token", "", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                maxAge: 0,
+                path: "/",
+                domain:
+                    process.env.NODE_ENV === "production"
+                        ? `.${process.env.SITE_URL_COOKIE}`
+                        : undefined,
+            });
+
+            res.setHeader("Set-Cookie", serialized);
+            return responseHandler({
+                msg: "success",
+                res: res,
+                status: 200,
+            });
+        } catch (error) {
+            return responseHandler({
+                data: null,
+                status: 500,
+                msg: "Something went wrong",
+                error: error,
+                res: res,
+            });
+        }
+    };
 }

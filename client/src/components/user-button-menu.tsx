@@ -10,9 +10,12 @@ import {
 } from "@bigcomponents/core";
 import { XIcon } from "@bigcomponents/core/lucide";
 import { useDisclosure } from "@bigcomponents/hooks";
+import { useLogout } from "@/hooks/useLogout";
 
 const UserButtonMenu = ({ user }: { user: IUser }) => {
     const [opened, handlers] = useDisclosure(false);
+
+    const { handleLogout } = useLogout();
 
     return (
         <DropdownMenu onOpenChange={handlers.toggle} open={opened}>
@@ -38,6 +41,10 @@ const UserButtonMenu = ({ user }: { user: IUser }) => {
                     >
                         <XIcon className="h-6 w-6" />
                     </Button>
+                </div>
+
+                <div className="flex justify-center p-4">
+                    <Button onClick={handleLogout}>Log out</Button>
                 </div>
             </DropdownMenuContent>
         </DropdownMenu>

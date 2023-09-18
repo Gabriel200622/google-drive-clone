@@ -1,8 +1,11 @@
 import fs from "fs";
+import { type UploadedFile } from "express-fileupload";
 import {
     S3Client,
     PutObjectCommand,
     GetObjectCommand,
+    DeleteObjectCommand,
+    ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { envs } from "../config";
@@ -15,13 +18,55 @@ const client = new S3Client({
     },
 });
 
-export async function uploadFile(file: any) {
-    const stream = fs.createReadStream(file.tempFilePath);
+export async function uploadFile(file: UploadedFile, fileKey: string) {
+    try {
+        const stream = fs.createReadStream(file.tempFilePath);
 
-    const command = new PutObjectCommand({
+        const command = new PutObjectCommand({
+            Bucket: envs.AWS_BUCKET_NAME,
+            Key: fileKey,
+            Body: stream,
+        });
+
+        return await client.send(command);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function uploadThumbnail(
+    pathToThumbnail: string,
+    thumbnailKey: string
+) {
+    try {
+        const stream = fs.createReadStream(pathToThumbnail);
+
+        const command = new PutObjectCommand({
+            Bucket: envs.AWS_BUCKET_NAME,
+            Key: thumbnailKey,
+            Body: stream,
+        });
+
+        return await client.send(command);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function deleteFile(key: string) {
+    const command = new DeleteObjectCommand({
         Bucket: envs.AWS_BUCKET_NAME,
-        Key: file.name,
-        Body: stream,
+        Key: key,
+    });
+
+    await client.send(command);
+
+    return "Deleted successfully";
+}
+
+export async function getFiles() {
+    const command = new ListObjectsV2Command({
+        Bucket: envs.AWS_BUCKET_NAME,
     });
 
     return await client.send(command);

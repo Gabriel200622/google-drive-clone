@@ -29,6 +29,20 @@ export interface IFolder {
     updatedAt: Date;
 }
 
+export interface IFile {
+    id: string;
+    name: string;
+    url: string;
+    key: string;
+    type: string;
+
+    thumbnail: string;
+    thumbnailKey: string;
+
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export interface IDataAxios extends AxiosResponse {
     data?: {
         msg: string;

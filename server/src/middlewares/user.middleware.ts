@@ -55,7 +55,6 @@ export class UserMiddleware {
                         data: null,
                         status: 401,
                         msg: error.message,
-                        error: error,
                         res: res,
                     })
                 );
@@ -64,7 +63,6 @@ export class UserMiddleware {
                 data: null,
                 status: 500,
                 msg: "Something went wrong",
-                error: error,
                 res: res,
             });
         }

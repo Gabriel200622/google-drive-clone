@@ -1,27 +1,41 @@
 import Folder from "@/components/folder";
+import File from "@/components/file";
 import StatusBar from "@/components/status-bar";
-import FoldersContainer from "@/components/folders-container";
 import DriveProvider from "@/components/drive-provider";
-import { IFolder } from "@/interfaces";
+import FoldersContainer from "@/components/folders-container";
+import FilesContainer from "@/components/files-container";
+import { IFile, IFolder } from "@/interfaces";
 import { fetchServer } from "@/utils/fetch-server";
 
 const DrivePage = async () => {
     const { data } = await fetchServer({ url: "/folder/all" });
+    const { data: filesResponse } = await fetchServer({ url: "/file/all" });
 
     const folders: IFolder[] = data?.data;
+    const files: IFile[] = filesResponse?.data;
 
     return (
         <>
             <StatusBar />
 
             <DriveProvider>
-                <h1 className="px-5 font-semibold">Create Folder</h1>
+                {folders.length ? (
+                    <FoldersContainer>
+                        {folders.map((folder, index) => (
+                            <Folder key={index} folder={folder} />
+                        ))}
+                    </FoldersContainer>
+                ) : null}
 
-                <FoldersContainer>
-                    {folders.map((folder, index) => (
-                        <Folder key={index} folder={folder} />
-                    ))}
-                </FoldersContainer>
+                <div className="mt-10"></div>
+
+                {files.length ? (
+                    <FilesContainer>
+                        {files.map((file, index) => (
+                            <File key={index} file={file} />
+                        ))}
+                    </FilesContainer>
+                ) : null}
             </DriveProvider>
         </>
     );

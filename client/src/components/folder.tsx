@@ -38,12 +38,10 @@ const Folder = ({ folder }: Props) => {
             onDoubleClick={() => router.push(`/folders/${folder.id}`)}
             className="px-4 py-3 rounded-2xl flex justify-between items-center border hover:bg-muted bg-muted/40"
         >
-            <div className="flex gap-3 items-center min-w-[120px]">
+            <div className="flex flex-1 gap-3 items-center max-w-[120px]">
                 <FolderIcon className="h-5 w-5" />
 
-                <div className="pointer-events-none truncate flex-1 select-none">
-                    {folder.name}
-                </div>
+                <div className="truncate flex-1 select-none">{folder.name}</div>
             </div>
 
             <DropdownMenu>

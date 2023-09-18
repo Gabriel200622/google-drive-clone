@@ -16,14 +16,7 @@ export class UserRoutes {
         router.get("/", middleware.checkAuth, controller.profile);
         router.get("/auth/google", controller.authGoogle);
         router.get("/auth/google/callback", controller.authGoogleCallback);
-
-        /* router.post("/upload", async (req, res) => {
-            if (req.files?.image) {
-                const result = await uploadFile(req.files.image);
-
-                res.json({ data: result });
-            }
-        }); */
+        router.get("/auth/logout", controller.logOut);
 
         return router;
     }
