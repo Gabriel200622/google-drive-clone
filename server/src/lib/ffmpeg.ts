@@ -1,5 +1,6 @@
 import ffmpeg from "fluent-ffmpeg";
 
+// Generate a thumbnail
 export async function generateThumbnail(
     videoUrl: string,
     thumbnailPath: string,
